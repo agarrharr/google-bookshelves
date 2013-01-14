@@ -3,9 +3,11 @@
 }
 .google_bookshelves_widget_book {
 	position: relative;
+	margin: 10px;
+}
+.google_bookshelves_widget_book img {
 	width: 128px;
 	height: 180px;
-	margin: 10px;
 }
 .google_bookshelves_widget_book_title {
 	position: absolute;
