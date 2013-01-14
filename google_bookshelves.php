@@ -42,9 +42,9 @@ class google_bookshelves extends WP_Widget{
 		extract($args, EXTR_SKIP);
 		$google_bookshelves_settings = get_option('google_bookshelves_settings');
 		$idNumber = ($google_bookshelves_settings['library_id'])? $google_bookshelves_settings['library_id']: '113720634485746776434';
-		$shelf = ($instance['shelf'])? $instance['shelf']: '0';
-		$customShelf = ($instance['customShelf'])? $instance['customShelf']: '2';
-		if (!empty($customShelf)){
+		$shelf = $instance['shelf'];
+		$customShelf = ($instance['customShelf'])? $instance['customShelf']: '-1';
+		if ($customShelf != "-1"){
 			$shelf = $customShelf;
 		}
 		$shelfName = ($instance['shelfName'])? $instance['shelfName']: getShelfName($idNumber, $shelf);
