@@ -3,7 +3,7 @@ Contributors: aharris88
 Donate link: http://www.adamwadeharris.com/donate
 Tags: books, ebooks, google, library, shelf, bookshelf, read
 Requires at least: 3.0.1
-Tested up to: 3.4
+Tested up to: 3.5
 Stable tag: 2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -21,7 +21,7 @@ With this plugin you can add show off your books from any of the shelves on your
 3. For the settings, go to Settings -> Google Bookshelves (instructions on settings page)
 4. Add the widget 'Google Bookshelves Widget' to the theme you are currently using
 5. and/or place the shortcode [google_bookshelves shelf="4" max="10" layout="description"] on any post or page
-6. and/or place <?php google_bookshelves(); ?> in your templates.
+6. and/or place `<?php google_bookshelves(); ?>` in your templates.
 
 == Frequently Asked Questions ==
 
@@ -29,8 +29,10 @@ Feel free to ask me any questions you want on the support page here or on the my
 
 == Screenshots ==
 
-1. Widget
-2. Settings
+1. Widget and Grid Layout
+2. Description Layout
+3. Settings
+4. Widget Settings
 
 == Changelog ==
 
