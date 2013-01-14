@@ -4,7 +4,7 @@ Plugin Name: Google Bookshelves
 Plugin URI: http://www.adamwadeharris.com/google-bookshelves/
 Description: This plugin allows you to put a widget on your site with the books from one of your Google Books Library. You pick the shelf and it automatically will show the most current books on that shelf.
 Author: Adam Harris
-Version: 2.0
+Version: 2.1
 Author URI: http://www.adamwadeharris.com
 
 Copyright 2012  Adam Harris  (email : adam@adamwadeharris.com)
@@ -49,13 +49,16 @@ class google_bookshelves extends WP_Widget{
 		}
 		$shelfName = ($instance['shelfName'])? $instance['shelfName']: getShelfName($idNumber, $shelf);
 		$title = ($instance['title'])? $instance['title']: $shelfName;
-		$maxResults = ($instance['maxResults'])? $instance['maxResults']: '10';
-		//$random = ($instance['random'])? $instance['random']: false;
+		$maxResults = intval(($instance['maxResults'])? $instance['maxResults']: '100');
+		$random = ($instance['random'])? $instance['random']: 'false';
 		?>
 		<div class="google_bookshelves">
         <h3 class="google_bookshelves_widget_title"><?php echo $title; ?></h3>
         <?php
-		$url = "https://www.googleapis.com/books/v1/users/".$idNumber."/bookshelves/".$shelf."/volumes?maxResults=" . $maxResults;		
+		$url = "https://www.googleapis.com/books/v1/users/".$idNumber."/bookshelves/".$shelf."/volumes";
+		if($random == 'false') {
+			$url .= "?maxResults=" . $maxResults;
+		}
 		$books = json_decode(getAPIRequest($idNumber, $shelf, $url));
 		
 		if(!empty($books->items)) {
@@ -71,12 +74,19 @@ class google_bookshelves extends WP_Widget{
 				}
 			}
 			
+			if($random == 'true'){
+				shuffle($results);
+			}
+			$counter = 0;
 			foreach($results as $key => $value) {
-				echo "<div class='google_bookshelves_widget_book'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['imageLink'] . "'/>";
-				if ($value['imageLink'] == plugin_dir_url(__FILE__).'images/no_cover_thumb.png'){
-					echo "<div class='google_bookshelves_widget_book_title'>" . $value['title'] . "</div>";
+				if($counter < $maxResults) {
+					echo "<div class='google_bookshelves_widget_book'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['imageLink'] . "'/>";
+					if ($value['imageLink'] == plugin_dir_url(__FILE__).'images/no_cover_thumb.png'){
+						echo "<div class='google_bookshelves_widget_book_title'>" . $value['title'] . "</div>";
+					}
+					echo "</a></div>";
 				}
-				echo "</a></div>";
+				$counter++;
 			}
 		}
 		if($google_bookshelves_settings['visibility_settings']['show_powered_by']) {
@@ -93,6 +103,14 @@ class google_bookshelves extends WP_Widget{
 		?>
 		<p> Make sure you set up your settings by going to Settings -> <a href='options-general.php?page=google-bookshelves/googlebooks.php'>Google Bookshelves</a></p>
         <br/>
+		<label for="<?php echo $this->get_field_id('title'); ?>">
+		Custom Widget Title:
+        <br/>
+		<input id="<?php echo $this->get_field_id('title'); ?>"
+			name="<?php echo $this->get_field_name('title'); ?>"
+			value="<?php echo esc_attr($instance['title']); ?>" />
+		</label>
+        <br/>
 		<label for="<?php echo $this->get_field_id('shelf'); ?>">
 		Shelf:
         <br/>
@@ -104,7 +122,8 @@ class google_bookshelves extends WP_Widget{
             <option value="0" <?php if(esc_attr($instance['shelf']) == 0) echo "selected"; ?>>Favorites</option>
          </select>
 		</label>
-		<br/><label for="<?php echo $this->get_field_id('customShelf'); ?>">
+		<br/>
+		<label for="<?php echo $this->get_field_id('customShelf'); ?>">
 		Or Custom Shelf ID:
         <br/>
 		<input id="<?php echo $this->get_field_id('customShelf'); ?>"
@@ -118,6 +137,16 @@ class google_bookshelves extends WP_Widget{
 		<input id="<?php echo $this->get_field_id('maxResults'); ?>"
 			name="<?php echo $this->get_field_name('maxResults'); ?>"
 			value="<?php echo esc_attr($instance['maxResults']); ?>" />
+		</label>
+        <br/>
+		<label for="<?php echo $this->get_field_id('shelf'); ?>">
+		Random Order:
+        <br/>
+		<select id="<?php echo $this->get_field_id('random'); ?>"
+			name="<?php echo $this->get_field_name('random'); ?>">
+            <option value="false" <?php if(esc_attr($instance['random']) == 'false') echo "selected"; ?>>No</option>
+            <option value="true" <?php if(esc_attr($instance['random']) == 'true') echo "selected"; ?>>Yes</option>
+         </select>
 		</label>
 		<?php
 	}
@@ -268,29 +297,34 @@ function getAPIRequest($idNumber, $shelf, $url) {
 }
 function google_bookshelves_shortcode($atts) {
 	extract( shortcode_atts( array(
+		'title' => '',
 		'shelf' => '4',
-		'max' => '10',
-		'layout' => 'grid'
+		'max' => '1000',
+		'layout' => 'grid',
+		'random' => 'false'
 	), $atts ) );
 	
 	ob_start();
-	google_bookshelves($shelf, $max, $layout);
+	google_bookshelves($title, $shelf, $max, $layout, $random);
 	$output_string = ob_get_contents();
 	ob_end_clean();	
 	return $output_string;
 }
 add_shortcode( 'google_bookshelves', 'google_bookshelves_shortcode' );
 
-function google_bookshelves($shelf = '4', $max = '10', $layout = 'grid') {
+function google_bookshelves($title = '', $shelf = '4', $maxResults = '1000', $layout = 'grid', $random = 'false') {
 	$google_bookshelves_settings = get_option('google_bookshelves_settings');
 	$idNumber = ($google_bookshelves_settings['library_id'])? $google_bookshelves_settings['library_id']: '113720634485746776434';
-	
-	$title = getShelfName($idNumber, $shelf);
+	$title = ($title == '')? getShelfName($idNumber, $shelf): $title;
+	$maxResults = intval($maxResults);
 	?>
 	<div class="google_bookshelves_shortcode">
 		<h2><?php echo $title; ?></h2>
 	<?php
-	$url = "https://www.googleapis.com/books/v1/users/".$idNumber."/bookshelves/".$shelf."/volumes?maxResults=" . $max;
+	$url = "https://www.googleapis.com/books/v1/users/".$idNumber."/bookshelves/".$shelf."/volumes";
+	if($random == "false") {
+		$url .= "?maxResults=" . $maxResults;
+	}
 	$books = json_decode(getAPIRequest($idNumber, $shelf, $url));
 	
 	if(!empty($books->items)){
@@ -318,22 +352,32 @@ function google_bookshelves($shelf = '4', $max = '10', $layout = 'grid') {
 			}
 		}
 		
+		if($random == "true"){
+			shuffle($results);
+		}
+		$counter = 0;
 		if($layout == "description") {
 			echo "<div class='google_bookshelves_shelf_description'>";
 			foreach($results as $key => $value) {
-				echo "<div class='google_bookshelves_book'>";
-				echo "<div class='google_bookshelves_image'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['imageLink'] . "'/></a></div>";
-				echo "<div class='google_bookshelves_text'>";
-				echo "<div class='google_bookshelves_title'>" . $value['title'] . "</div>";
-				echo "<div class='google_bookshelves_authors'>by " . $value['authors'] . "</div>";
-				echo "<div class='google_bookshelves_description'>" . $value['description'] . "</div>";
-				echo "</div></div>";
+				if($counter < $maxResults) {
+					echo "<div class='google_bookshelves_book'>";
+					echo "<div class='google_bookshelves_image'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['imageLink'] . "'/></a></div>";
+					echo "<div class='google_bookshelves_text'>";
+					echo "<div class='google_bookshelves_title'>" . $value['title'] . "</div>";
+					echo "<div class='google_bookshelves_authors'>by " . $value['authors'] . "</div>";
+					echo "<div class='google_bookshelves_description'>" . $value['description'] . "</div>";
+					echo "</div></div>";
+				}
+				$counter++;
 			}
 			echo "</div>";
 		}else if($layout == "grid"){
 			echo "<div class='google_bookshelves_shelf_grid'>";
 			foreach($results as $key=> $value) {
-				echo "<div class='google_bookshelves_book'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['imageLink'] . "'/></a></div>";
+				if($counter < $maxResults) {
+					echo "<div class='google_bookshelves_book'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['imageLink'] . "'/></a></div>";
+				}
+				$counter++;
 			}
 			echo "</div>";
 		}

@@ -4,7 +4,7 @@ Donate link: http://www.adamwadeharris.com/donate
 Tags: books, ebooks, google, library, shelf, bookshelf, read
 Requires at least: 3.0.1
 Tested up to: 3.5
-Stable tag: 2.0
+Stable tag: 2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,6 +36,10 @@ Feel free to ask me any questions you want on the support page here or on the my
 
 == Changelog ==
 
+= 2.1 =
+* Added custom titles
+* Added ability to show books in random order
+
 = 2.0 =
 * Added settings page
 * Added shortcode
@@ -48,6 +52,9 @@ Feel free to ask me any questions you want on the support page here or on the my
 * This is the first version
 
 == Upgrade Notice ==
+
+= 2.1 =
+This is a minor update
 
 = 2.0 =
 This is the second version

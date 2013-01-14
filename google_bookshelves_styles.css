@@ -21,12 +21,16 @@
 .google_bookshelves_shelf_description
 .google_bookshelves_book {
 	clear: left;
-	min-height: 90px;
 	margin-bottom: 20px;
 }
 .google_bookshelves_shelf_description
 .google_bookshelves_image {
 	float: left;
+}
+.google_bookshelves_shelf_description
+.google_bookshelves_image img {
+	width: 57px;
+	height: 80px;
 }
 .google_bookshelves_shelf_description
 .google_bookshelves_text {
