@@ -31,7 +31,7 @@ add_action('widgets_init', 'googleBooks_widget_init');
 add_action('wp_head', 'addStyles');
 
 class google_bookshelves extends WP_Widget{
-	function google_bookshelves() {
+	function __construct() {
 		$widget_options = array(
 			'classname' => 'google_bookshelves_widget'
 		);
@@ -189,7 +189,8 @@ function google_bookshelves_settings() {
 	$google_bookshelves_settings = get_option('google_bookshelves_settings');
 	?>
 	
-	<div id="icon-options-general" class="icon32"></div><h2>Google Bookshelves Settings</h2>
+	<div id="icon-options-general" class="icon32"></div>
+	<h2>Google Bookshelves Settings</h2>
 	
 	<?php
 	if(strlen($message) > 0) {
@@ -319,7 +320,7 @@ function google_bookshelves($title = '', $shelf = '4', $maxResults = '1000', $la
 	$maxResults = intval($maxResults);
 	?>
 	<div class="google_bookshelves_shortcode">
-		<h2><?php echo $title; ?></h2>
+		<h3><?php echo $title; ?></h3>
 	<?php
 	$url = "https://www.googleapis.com/books/v1/users/".$idNumber."/bookshelves/".$shelf."/volumes";
 	if($random == "false") {
