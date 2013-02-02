@@ -36,6 +36,9 @@ Feel free to ask me any questions you want on the support page here or on the my
 
 == Changelog ==
 
+= 2.1.1 =
+* Fixed width on titles on books with no cover
+
 = 2.1 =
 * Added custom titles
 * Added ability to show books in random order
@@ -52,6 +55,9 @@ Feel free to ask me any questions you want on the support page here or on the my
 * This is the first version
 
 == Upgrade Notice ==
+
+= 2.1.1 =
+* Fixed width on titles on books with no cover
 
 = 2.1 =
 This is a minor update
