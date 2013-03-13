@@ -3,8 +3,8 @@ Contributors: aharris88
 Donate link: http://www.adamwadeharris.com/donate
 Tags: books, ebooks, google, library, shelf, bookshelf, read
 Requires at least: 3.0.1
-Tested up to: 3.5
-Stable tag: 2.1.1
+Tested up to: 3.5.1
+Stable tag: 2.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,6 +36,10 @@ Feel free to ask me any questions you want on the support page here or on the my
 
 == Changelog ==
 
+= 2.1.2 =
+* Fix title of widget to work with any theme
+* Make author link open in new tab
+
 = 2.1.1 =
 * Fixed width on titles on books with no cover
 
@@ -55,6 +59,9 @@ Feel free to ask me any questions you want on the support page here or on the my
 * This is the first version
 
 == Upgrade Notice ==
+
+= 2.1.2 =
+* This will look better on any theme
 
 = 2.1.1 =
 * Fixed width on titles on books with no cover

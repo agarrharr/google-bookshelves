@@ -4,7 +4,7 @@ Plugin Name: Google Bookshelves
 Plugin URI: http://www.adamwadeharris.com/google-bookshelves/
 Description: This plugin allows you to put a widget on your site with the books from one of your Google Books Library. You pick the shelf and it automatically will show the most current books on that shelf.
 Author: Adam Harris
-Version: 2.1.1
+Version: 2.1.2
 Author URI: http://www.adamwadeharris.com
 
 Copyright 2012  Adam Harris  (email : adam@adamwadeharris.com)
