@@ -47,11 +47,14 @@ class google_bookshelves extends WP_Widget{
 		if ($customShelf != "-1"){
 			$shelf = $customShelf;
 		}
+		$shelfName = ($instance['shelfName'])? $instance['shelfName']: getShelfName($idNumber, $shelf);
 		$title = ($instance['title'])? $instance['title']: $shelfName;
 		$max = intval(($instance['maxResults'])? $instance['maxResults']: '100');
 		$random = ($instance['random'])? $instance['random']: 'false';
 		
-		google_bookshelves($title, $shelf, $max, 'row', $random, true);
+		echo $before_widget . $before_title . $title . $after_title;
+		echo google_bookshelves($shelf, $max, 'row', $random);
+		echo $after_widget;
 	}
 	
 	function form($instance) {
@@ -260,25 +263,19 @@ function google_bookshelves_shortcode($atts) {
 		'random' => 'false'
 	), $atts ) );
 	
-	ob_start();
-	google_bookshelves($title, $shelf, $max, $layout, $random, false);
-	$output_string = ob_get_contents();
-	ob_end_clean();	
-	return $output_string;
+	//not dry
+	$idNumber = ($google_bookshelves_settings['library_id'])? $google_bookshelves_settings['library_id']: '113720634485746776434';
+	$title = ($title == '')? getShelfName($idNumber, $shelf): $title;
+	return "<div class='google_bookshelves'><h3><span>" . $title . "</span></h3>" .google_bookshelves($shelf, $max, $layout, $random) . "</div>";;
 }
 add_shortcode( 'google_bookshelves', 'google_bookshelves_shortcode' );
 
-function google_bookshelves_ajax($title = '', $shelf = '4', $maxResults = '1000', $layout = 'grid', $random = 'false') {
-	
-}
-function google_bookshelves($title = '', $shelf = '4', $maxResults = '1000', $layout = 'grid', $random = 'false', $widget = false) {
+function google_bookshelves($shelf = '4', $maxResults = '1000', $layout = 'grid', $random = 'false') {
 	$google_bookshelves_settings = get_option('google_bookshelves_settings');
+	//not dry
 	$idNumber = ($google_bookshelves_settings['library_id'])? $google_bookshelves_settings['library_id']: '113720634485746776434';
-	$title = ($title == '')? getShelfName($idNumber, $shelf): $title;
 	$maxResults = intval($maxResults);
-	echo "<div class='google_bookshelves'><h3 ";
-	if($widget) echo "class='widgettitle'";
-	echo "><span>" .$title . "</span></h3>";
+	$output = "";
 	$url = "https://www.googleapis.com/books/v1/users/".$idNumber."/bookshelves/".$shelf."/volumes";
 	if($random == "false") {
 		$url .= "?maxResults=" . $maxResults;
@@ -319,39 +316,38 @@ function google_bookshelves($title = '', $shelf = '4', $maxResults = '1000', $la
 			echo "<div class='google_bookshelves_shelf_description'>";
 			foreach($results as $key => $value) {
 				if($counter < $maxResults) {
-					echo "<div class='google_bookshelves_book'>";
-					echo "<div class='google_bookshelves_image'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['smallthumb'] . "'/></a></div>";
-					echo "<div class='google_bookshelves_text'>";
-					echo "<div class='google_bookshelves_title'>" . $value['title'] . "</div>";
-					echo "<div class='google_bookshelves_authors'>by " . $value['authors'] . "</div>";
-					echo "<div class='google_bookshelves_description'>" . $value['description'] . "</div>";
-					echo "</div></div>";
+					$output .= "<div class='google_bookshelves_book'>";
+					$output .= "<div class='google_bookshelves_image'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['smallthumb'] . "'/></a></div>";
+					$output .= "<div class='google_bookshelves_text'>";
+					$output .= "<div class='google_bookshelves_title'>" . $value['title'] . "</div>";
+					$output .= "<div class='google_bookshelves_authors'>by " . $value['authors'] . "</div>";
+					$output .= "<div class='google_bookshelves_description'>" . $value['description'] . "</div>";
+					$output .= "</div></div>";
 				}
 				$counter++;
 			}
-			echo "</div>";
+			$output .= "</div>";
 		}else if($layout == "grid"){
-			echo "<div class='google_bookshelves_shelf_grid'>";
+			$output .= "<div class='google_bookshelves_shelf_grid'>";
 			foreach($results as $key=> $value) {
 				if($counter < $maxResults) {
 					echo "<div class='google_bookshelves_book'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['smallthumb'] . "'/></a></div>";
 				}
 				$counter++;
 			}
-			echo "</div>";
+			$output .= "</div>";
 		}else if ($layout == "row") {
 			foreach($results as $key=> $value) {
 				if($counter < $maxResults) {
-					echo "<div class='google_bookshelves_widget_book'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['thumb'] . "'/></a></div>";
+					$output .= "<div class='google_bookshelves_widget_book'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['thumb'] . "'/></a></div>";
 				}
 				$counter++;
 			}
 		}
-		echo "</div>";
+		if($google_bookshelves_settings['visibility_settings']['show_powered_by']) {
+			$output .= "<br/>Plugin by <a href='http://www.adamwadeharris.com' target='_blank'>Adam</a>.<br/><br/>";
+		}
 	}
-	
-	if($google_bookshelves_settings['visibility_settings']['show_powered_by']) {
-		echo "<br/>Plugin by <a href='http://www.adamwadeharris.com'>Adam</a>.<br/><br/>";
-	}
+	return $output;
 }
 ?>
