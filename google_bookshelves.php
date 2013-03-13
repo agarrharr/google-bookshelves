@@ -47,56 +47,12 @@ class google_bookshelves extends WP_Widget{
 		if ($customShelf != "-1"){
 			$shelf = $customShelf;
 		}
-		$shelfName = ($instance['shelfName'])? $instance['shelfName']: getShelfName($idNumber, $shelf);
+		//$shelfName = ($instance['shelfName'])? $instance['shelfName']: getShelfName($idNumber, $shelf);
 		$title = ($instance['title'])? $instance['title']: $shelfName;
-		$maxResults = intval(($instance['maxResults'])? $instance['maxResults']: '100');
+		$max = intval(($instance['maxResults'])? $instance['maxResults']: '100');
 		$random = ($instance['random'])? $instance['random']: 'false';
-		?>
-		<div class="google_bookshelves">
-        <h3 class="google_bookshelves_widget_title"><?php echo $title; ?></h3>
-        <?php
-		$url = "https://www.googleapis.com/books/v1/users/".$idNumber."/bookshelves/".$shelf."/volumes";
-		if($random == 'false') {
-			$url .= "?maxResults=" . $maxResults;
-		}
-		$books = json_decode(getAPIRequest($idNumber, $shelf, $url));
 		
-		if(!empty($books->items)) {
-			foreach($books->items as $book) {
-				if(!empty($book)) {
-					$imageLink = plugin_dir_url(__FILE__).'images/no_cover_thumb.png';
-					if(!empty($book->volumeInfo->imageLinks->thumbnail)) {
-						$imageLink = $book->volumeInfo->imageLinks->thumbnail;
-					}
-					$results[] = array('title' => $book->volumeInfo->title,
-					'imageLink' => $imageLink,
-					'infoLink' => $book->volumeInfo->infoLink);
-				}
-			}
-			
-			if($random == 'true'){
-				shuffle($results);
-			}
-			$counter = 0;
-			foreach($results as $key => $value) {
-				if($counter < $maxResults) {
-					echo "<div class='google_bookshelves_widget_book'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['imageLink'] . "'/>";
-					if ($value['imageLink'] == plugin_dir_url(__FILE__).'images/no_cover_thumb.png'){
-						echo "<div class='google_bookshelves_widget_book_title'>" . $value['title'] . "</div>";
-					}
-					echo "</a></div>";
-				}
-				$counter++;
-			}
-		}
-		if($google_bookshelves_settings['visibility_settings']['show_powered_by']) {
-		?>
-			<br/>Plugin by <a href="http://www.adamwadeharris.com">Adam</a>.<br />
-        <?php
-		}
-		?>
-		</div>
-		<?php
+		google_bookshelves($title, $shelf, $max, 'row', $random);
 	}
 	
 	function form($instance) {
@@ -319,7 +275,7 @@ function google_bookshelves($title = '', $shelf = '4', $maxResults = '1000', $la
 	$title = ($title == '')? getShelfName($idNumber, $shelf): $title;
 	$maxResults = intval($maxResults);
 	?>
-	<div class="google_bookshelves_shortcode">
+	<div class="google_bookshelves">
 		<h3><?php echo $title; ?></h3>
 	<?php
 	$url = "https://www.googleapis.com/books/v1/users/".$idNumber."/bookshelves/".$shelf."/volumes";
@@ -331,11 +287,11 @@ function google_bookshelves($title = '', $shelf = '4', $maxResults = '1000', $la
 	if(!empty($books->items)){
 		foreach($books->items as $book){
 			if(!empty($book)){
-				if(!empty($book)) {
-					$imageLink = plugin_dir_url(__FILE__).'images/no_cover_smallthumb.png';
-					if(!empty($book->volumeInfo->imageLinks->smallThumbnail)) {
-						$imageLink = $book->volumeInfo->imageLinks->smallThumbnail;
-					}
+				$smallthumb = plugin_dir_url(__FILE__).'images/no_cover_smallthumb.png';
+				$thumb = plugin_dir_url(__FILE__).'images/no_cover_thumb.png';
+				if(!empty($book->volumeInfo->imageLinks->smallThumbnail)) {
+					$smallthumb = $book->volumeInfo->imageLinks->smallThumbnail;
+					$thumb = $book->volumeInfo->imageLinks->thumbnail;
 				}
 				
 				if(!empty($book->volumeInfo->description)){
@@ -345,11 +301,12 @@ function google_bookshelves($title = '', $shelf = '4', $maxResults = '1000', $la
 				}
 									
 				$results[] = array('title' => $book->volumeInfo->title,
-				'imageLink' => $imageLink,
+				'smallthumb' => $smallthumb,
+				'thumb' => $thumb,
 				'infoLink' => $book->volumeInfo->infoLink,
 				'authors' => $book->volumeInfo->authors[0],
 				'description' => $description,
-				);					
+				);
 			}
 		}
 		
@@ -362,7 +319,7 @@ function google_bookshelves($title = '', $shelf = '4', $maxResults = '1000', $la
 			foreach($results as $key => $value) {
 				if($counter < $maxResults) {
 					echo "<div class='google_bookshelves_book'>";
-					echo "<div class='google_bookshelves_image'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['imageLink'] . "'/></a></div>";
+					echo "<div class='google_bookshelves_image'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['smallthumb'] . "'/></a></div>";
 					echo "<div class='google_bookshelves_text'>";
 					echo "<div class='google_bookshelves_title'>" . $value['title'] . "</div>";
 					echo "<div class='google_bookshelves_authors'>by " . $value['authors'] . "</div>";
@@ -376,11 +333,18 @@ function google_bookshelves($title = '', $shelf = '4', $maxResults = '1000', $la
 			echo "<div class='google_bookshelves_shelf_grid'>";
 			foreach($results as $key=> $value) {
 				if($counter < $maxResults) {
-					echo "<div class='google_bookshelves_book'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['imageLink'] . "'/></a></div>";
+					echo "<div class='google_bookshelves_book'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['smallthumb'] . "'/></a></div>";
 				}
 				$counter++;
 			}
 			echo "</div>";
+		}else if ($layout == "row") {
+			foreach($results as $key=> $value) {
+				if($counter < $maxResults) {
+					echo "<div class='google_bookshelves_widget_book'><a href='" . $value['infoLink'] . "' target='_blank'><img src='" . $value['thumb'] . "'/></a></div>";
+				}
+				$counter++;
+			}
 		}
 		echo "</div>";
 	}
