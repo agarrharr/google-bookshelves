@@ -31,10 +31,10 @@ Feel free to ask me any questions you want on the support page here or on the my
 
 == Screenshots ==
 
-1. Widget and Grid Layout
-2. Description Layout
-3. Settings
-4. Widget Settings
+1. Widget and Description Layout
+2. Grid Layout
+3. Settings Page
+4. Widget Options
 
 == Changelog ==
 
