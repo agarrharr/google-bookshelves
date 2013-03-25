@@ -4,7 +4,7 @@ Donate link: http://www.adamwadeharris.com/donate
 Tags: books, ebooks, google, library, shelf, bookshelf, read
 Requires at least: 3.0.1
 Tested up to: 3.5.1
-Stable tag: 2.2
+Stable tag: 2.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,6 +37,9 @@ Feel free to ask me any questions you want on the support page here or on the my
 4. Widget Options
 
 == Changelog ==
+
+= 2.2.1 =
+* Fixes no cover image bug
 
 = 2.2 =
 * Fixes link to settings page from widget
@@ -74,6 +77,9 @@ Feel free to ask me any questions you want on the support page here or on the my
 * This is the first version
 
 == Upgrade Notice ==
+
+= 2.2.1 =
+* Update for minor bug
 
 = 2.2 =
 * Add several features
